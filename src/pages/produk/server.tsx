@@ -16,7 +16,8 @@ export default halamanProdukServer;
 
 // Fungsi getServerSideProps akan dipanggil setiap kali halaman ini diakses
 export async function getServerSideProps() {
-  const res = await fetch("http://localhost:3000/api/produk");
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/produk`);
   const respone = await res.json();
 
   return {

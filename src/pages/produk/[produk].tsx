@@ -1,31 +1,42 @@
-import fetcher from "@/utils/swr/fetcher";
-import { useRouter } from "next/router";
-import useSWR from "swr";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { ProductType } from "@/types/Product.type";
 
-const HalamanProduk = () => {
-  const { query } = useRouter();
+type ProdukApiResponse = {
+  data: ProductType[];
+};
 
-  const { data, error, isLoading } = useSWR(
-    query.produk ? `/api/produk/${query.produk}` : null,
-    fetcher
-  );
+const HalamanProduk = ({
+  product,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (!product) {
+    return <p>Produk tidak ditemukan.</p>;
+  }
 
   return (
     <div>
       <h1>Halaman Produk</h1>
-      <p>Produk: {query.produk}</p>
-
-      {isLoading && <p>Loading...</p>}
-      {error && <p>Error...</p>}
-
-      {data && (
-        <div>
-          <p>Nama: {data.name}</p>
-          <p>Harga: {data.price}</p>
-        </div>
-      )}
+      <p>Produk: {product.id}</p>
+      <p>Nama: {product.name}</p>
+      <p>Harga: {product.price}</p>
     </div>
   );
 };
 
 export default HalamanProduk;
+
+export const getServerSideProps: GetServerSideProps<{
+  product: ProductType | null;
+}> = async ({ params }) => {
+  const produkId = String(params?.produk || "");
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/produk`);
+  const response: ProdukApiResponse = await res.json();
+
+  const product = response.data.find((item) => item.id === produkId) || null;
+
+  return {
+    props: {
+      product,
+    },
+  };
+};
