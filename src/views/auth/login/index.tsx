@@ -88,11 +88,11 @@ const Tampilanlogin = () => {
             <br />
 
             <button
+              type="button"
               onClick={() => signIn("google", { callbackUrl, redirect: false })}
               className={style.login_form__button}
-              disabled={isLoading}
             >
-              {isLoading ? "Wait a second..." : "Sign in with Google"}
+              Sign in with Google
             </button>
 
             <br />
